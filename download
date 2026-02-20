@@ -1,0 +1,194 @@
+# How to Deploy Harmonia on GitHub + Render
+## Step-by-Step Beginner Guide
+
+---
+
+## Part 1: Create a GitHub Account & Repository
+
+### Step 1: Sign Up for GitHub
+1. Go to **github.com**
+2. Click **"Sign Up"** (top right)
+3. Enter your email, create a password, choose a username
+4. Verify your email address
+5. You're in!
+
+### Step 2: Install Git on Your Computer
+
+**Windows:**
+1. Go to **git-scm.com/download/win**
+2. Download and run the installer
+3. Click "Next" through all options (defaults are fine)
+4. Open **Git Bash** from Start Menu to verify: type `git --version`
+
+**Mac:**
+1. Open **Terminal** (search in Spotlight)
+2. Type: `git --version`
+3. If not installed, it will prompt you to install Xcode tools — click "Install"
+
+### Step 3: Create a New Repository
+1. Go to **github.com** and click the **"+"** icon (top right) → **"New repository"**
+2. Fill in:
+   - **Repository name:** `harmonia-website`
+   - **Description:** `Harmonia - The Compatibility Engine website`
+   - **Visibility:** Choose **Public** or **Private**
+   - ✅ Check **"Add a README file"** — NO (we already have one)
+3. Click **"Create repository"**
+4. You'll see setup instructions — keep this page open
+
+### Step 4: Upload Your Code
+
+**Option A: Using GitHub Web (Easiest)**
+1. On your new repo page, click **"uploading an existing file"**
+2. Drag and drop ALL files from the unzipped `harmonia` folder
+3. Scroll down, add commit message: "Initial upload"
+4. Click **"Commit changes"**
+
+**Option B: Using Git Command Line**
+1. Open Terminal/Git Bash
+2. Navigate to your unzipped project folder:
+   ```bash
+   cd path/to/harmonia
+   ```
+3. Initialize and push:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit - Harmonia website"
+   git branch -M main
+   git remote add origin https://github.com/YOUR-USERNAME/harmonia-website.git
+   git push -u origin main
+   ```
+4. Enter your GitHub username and password (or token) when prompted
+
+**Note on Tokens:** GitHub now requires a Personal Access Token instead of password.
+1. Go to **github.com** → Settings → Developer Settings → Personal Access Tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Give it a name, select "repo" scope, click "Generate"
+4. Copy the token and use it as your password when pushing
+
+---
+
+## Part 2: Deploy on Render
+
+### Step 1: Sign Up for Render
+1. Go to **render.com**
+2. Click **"Get Started for Free"**
+3. Sign up with your **GitHub account** (recommended — links automatically)
+
+### Step 2: Create a New Web Service
+1. From the Render dashboard, click **"New +"** → **"Web Service"**
+2. Under **"Build and deploy from a Git repository"**, click **"Next"**
+3. Connect your GitHub account if not already connected
+4. Find and select **`harmonia-website`** from the repo list
+5. Click **"Connect"**
+
+### Step 3: Configure the Service
+Fill in these settings:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | `harmonia-website` |
+| **Region** | Choose closest to you (e.g., Frankfurt for EU) |
+| **Branch** | `main` |
+| **Runtime** | `Node` |
+| **Build Command** | `npm install` |
+| **Start Command** | `npm start` |
+| **Instance Type** | `Free` |
+
+### Step 4: Deploy!
+1. Click **"Create Web Service"**
+2. Render will:
+   - Clone your repository
+   - Run `npm install` (installs Express)
+   - Run `npm start` (starts the server)
+3. Wait 2-3 minutes for the build to complete
+4. Your site will be live at: **`https://harmonia-website.onrender.com`**
+
+### Step 5: Verify It Works
+1. Click the URL that Render provides
+2. Check that:
+   - ✅ Home page loads with the Celtic Knot logo
+   - ✅ Navigation links work between pages
+   - ✅ Dark/light theme toggle works
+   - ✅ WebGL particles are visible in the background
+   - ✅ P2P page shows the interactive preview
+   - ✅ Mobile hamburger menu works
+
+---
+
+## Part 3: Updating Your Site
+
+### Making Changes
+1. Edit files in your local project folder
+2. Open Terminal/Git Bash in the project folder:
+   ```bash
+   git add .
+   git commit -m "Description of what you changed"
+   git push
+   ```
+3. Render automatically detects the push and redeploys (takes ~2 minutes)
+
+### Using Claude/AI to Make Changes
+1. Download your project as zip from GitHub (Code → Download ZIP)
+2. Upload to Claude, request changes
+3. Download the updated zip from Claude
+4. Extract and replace your local files
+5. Push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Updated via Claude AI"
+   git push
+   ```
+
+---
+
+## Part 4: Custom Domain (Optional)
+
+### Step 1: Buy a Domain
+- **Namecheap** (namecheap.com) — affordable
+- **Google Domains** → now Squarespace Domains
+- **Cloudflare** (cloudflare.com) — cheapest at-cost pricing
+
+### Step 2: Connect to Render
+1. In Render dashboard → Your service → **"Settings"**
+2. Scroll to **"Custom Domains"**
+3. Click **"Add Custom Domain"**
+4. Enter your domain (e.g., `harmonia.io`)
+5. Render will give you a **CNAME record** to add to your domain DNS
+6. Add the CNAME in your domain registrar's DNS settings
+7. Wait 5-30 minutes for DNS propagation
+8. Render automatically provisions an SSL certificate
+
+---
+
+## Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Build fails | Check the Render logs — usually a missing dependency. Make sure `package.json` has `express` |
+| Page not found | Make sure all HTML files are in the root directory, not in a subfolder |
+| CSS/JS not loading | Check file paths in HTML — should be `css/style.css` not `/css/style.css` |
+| Git push rejected | Pull first: `git pull origin main --rebase` then push again |
+| Site shows old version | Check Render dashboard — redeploy might still be in progress |
+| Free tier sleeps | Render Free tier sleeps after 15min of inactivity. First visit takes ~30s to wake up |
+
+---
+
+## File Compatibility Checklist
+
+Before deploying, verify:
+- [x] `package.json` exists in root with `express` dependency
+- [x] `server.js` exists in root
+- [x] All HTML files reference `css/style.css` (not absolute paths)
+- [x] All HTML files reference `js/app.js` and `js/webgl.js`
+- [x] `assets/logo.png` exists
+- [x] No file paths start with `/` (use relative paths)
+- [x] `node_modules/` is NOT committed (add to `.gitignore`)
+
+### Create .gitignore
+Create a file called `.gitignore` in your project root:
+```
+node_modules/
+.DS_Store
+*.log
+```
